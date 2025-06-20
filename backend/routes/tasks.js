@@ -4,5 +4,6 @@ const { verifyToken } = require('../middlewares/authMiddleware');
 
 router.post('/', verifyToken, createTask);
 router.get('/:challengeId', getTasksByChallenge);
+router.post('/auto-generate', verifyToken, createTask);
 
 module.exports = router;
