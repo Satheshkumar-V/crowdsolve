@@ -15,6 +15,37 @@ A full-stack challenge-solving platform that combines collaboration, action boar
 
 ## 🚀 Running Locally
 
+## System Architecture
+
++----------------+       +----------------+       +---------------------+
+|                |       |                |       |                     |
+|   Frontend     | <-->  |   Backend API  | <-->  |     MongoDB Atlas   |
+| (React + Vite) |       | (Node.js +     |       |   (Cloud Database)  |
+|                |       |  Express.js)   |       |                     |
++----------------+       +----------------+       +---------------------+
+        |                        |
+        v                        v
++----------------+       +-------------------------+
+|  Auth Module   |       |    Challenge Module     |
+|                |       |  Solution, Task APIs    |
++----------------+       +-------------------------+
+                                  |
+                                  v
+         +----------------------------------------------------+
+         |                    AI Agents (Flask)               |
+         |    (Running independently as microservices)        |
+         +----------------------------------------------------+
+               |              |               |             |
+               v              v               v             v
+       +---------------+ +---------------+ +---------------+ +------------------+
+       | Tag Suggester | | Thread Builder| | Task Extractor| | Calendar Integrator|
+       | (port 7001)   | | (port 7002)   | | (port 7003)   | | (port 7004)        |
+       +---------------+ +---------------+ +---------------+ +------------------+
+               |              |               |             |
+               v              v               v             v
+         Uses OpenRouter / HuggingFace APIs for AI-powered results
+
+
 ### 1. Backend
 
 ```bash
