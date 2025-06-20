@@ -1,0 +1,3 @@
+backend/.env
+agents/.env
+backend/node_modules
