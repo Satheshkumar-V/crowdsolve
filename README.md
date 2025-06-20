@@ -104,7 +104,7 @@ frontend/         # React + Vite client app
 ---
 
 ## Workflow
-flowchart TD
+- **flowchart TD:**
   A[👤 User Registers / Logs In] --> B[📝 Post a Challenge]
   B --> C[🤖 Tag Suggester Agent]
   C --> B2[🏷️ Tags Suggested]
