@@ -1,0 +1,1 @@
+# CrowdSolve Backend\nSimple Node.js + Express + MongoDB API for CrowdSolve platform.
