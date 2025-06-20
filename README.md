@@ -105,34 +105,34 @@ frontend/         # React + Vite client app
 
 ## Workflow
 - **flowchart TD:**
-  A[👤 User Registers / Logs In] --> B[📝 Post a Challenge]
-  B --> C[🤖 Tag Suggester Agent]
-  C --> B2[🏷️ Tags Suggested]
+  - A[👤 User Registers / Logs In] --> B[📝 Post a Challenge]
+  - B --> C[🤖 Tag Suggester Agent]
+  - C --> B2[🏷️ Tags Suggested]
 
-  B2 --> D[💡 Submit Solutions]
-  D --> E[🤖 Thread Builder Agent]
-  E --> D2[🧵 Sub-Solutions Suggested]
+  - B2 --> D[💡 Submit Solutions]
+  - D --> E[🤖 Thread Builder Agent]
+  - E --> D2[🧵 Sub-Solutions Suggested]
 
-  D2 --> F[✅ Convert to Task Board]
-  F --> G[🤖 Task Extractor Agent]
-  G --> H[🗂️ Actionable Tasks Generated]
+  - D2 --> F[✅ Convert to Task Board]
+  - F --> G[🤖 Task Extractor Agent]
+  - G --> H[🗂️ Actionable Tasks Generated]
 
-  H --> I[📅 Calendar Integrator Agent]
-  I --> J[🕒 Deadlines Assigned]
+  - H --> I[📅 Calendar Integrator Agent]
+  - I --> J[🕒 Deadlines Assigned]
 
-  J --> K[🏆 Earn Credits & Badges]
-  K --> L[📊 Leaderboards & Celebration]
+  - J --> K[🏆 Earn Credits & Badges]
+  - K --> L[📊 Leaderboards & Celebration]
 
-  D2 --> M[🚩 Flag Content]
-  M --> N[🔍 Moderation Actions]
+  - D2 --> M[🚩 Flag Content]
+  - M --> N[🔍 Moderation Actions]
 
-  style A fill:#E3F6FC,stroke:#0BB
-  style B fill:#FFF5CC
-  style D fill:#E8F9E2
-  style F fill:#F5E3FC
-  style H fill:#D6F5F5
-  style K fill:#FCDAD2
-  style M fill:#FFE1E1
+  - style A fill:#E3F6FC,stroke:#0BB
+  - style B fill:#FFF5CC
+  - style D fill:#E8F9E2
+  - style F fill:#F5E3FC
+  - style H fill:#D6F5F5
+  - style K fill:#FCDAD2
+  - style M fill:#FFE1E1
 
 ## 📝 License
 
