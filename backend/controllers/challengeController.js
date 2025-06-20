@@ -1,5 +1,5 @@
 const Challenge = require('../models/Challenge');
-const { getSuggestedTags } = require('../services/aiService');
+// const { getSuggestedTags } = require('../services/aiService');
 
 exports.createChallenge = async (req, res) => {
   try {

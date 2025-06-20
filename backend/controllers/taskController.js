@@ -1,5 +1,5 @@
 const Task = require('../models/Task');
-const { extractTasksFromSolution, suggestTaskDeadlines } = require('../services/aiService');
+// const { extractTasksFromSolution, suggestTaskDeadlines } = require('../services/aiService');
 
 exports.createTask = async (req, res) => {
 const { challengeId, solutionText } = req.body;

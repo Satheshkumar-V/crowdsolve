@@ -1,5 +1,5 @@
 const SolutionThread = require('../models/SolutionThread');
-const { getSubSolutionThreads } = require('../services/aiService');
+// const { getSubSolutionThreads } = require('../services/aiService');
 
 exports.createSolution = async (req, res) => {
   try {
