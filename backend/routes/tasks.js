@@ -1,9 +1,9 @@
-const router = require('express').Router();
-const { createTask, getTasksByChallenge } = require('../controllers/taskController');
+const express = require('express');
+const router = express.Router();
+const taskController = require('../controllers/taskController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 
-router.post('/', verifyToken, createTask);
-router.get('/:challengeId', getTasksByChallenge);
-router.post('/auto-generate', verifyToken, createTask);
+router.post('/auto-generate', verifyToken, taskController.autoGenerateTasks);
+router.get('/:challengeId', taskController.getTasksByChallenge);
 
 module.exports = router;

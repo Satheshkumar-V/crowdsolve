@@ -1,10 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ChallengeBoard from './pages/ChallengeBoard';
 import ChallengeDetails from './pages/ChallengeDetails';
 import TaskBoard from './pages/TaskBoard';
-import Navbar from './components/Navbar';
 
 function App() {
   return (

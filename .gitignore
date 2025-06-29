@@ -1,0 +1,4 @@
+crowdSolve_Agents/.gitignore
+crowdSolve_Agents/.env
+.venv
+backend/.gitignore

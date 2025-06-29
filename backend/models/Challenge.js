@@ -5,12 +5,11 @@ const challengeSchema = new mongoose.Schema({
   description: String,
   content: String,
   tags: [String],
-  urgency: { type: String, enum: ['Low', 'Medium', 'High'] },
+  urgency: String,
   category: String,
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   attachments: [String],
-  createdAt: { type: Date, default: Date.now },
-  status: { type: String, enum: ['open', 'closed'], default: 'open' }
-});
-
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  bounty: { type: Number, default: 0 },
+  status: { type: String, default: 'open' }
+}, { timestamps: true });
 module.exports = mongoose.model('Challenge', challengeSchema);

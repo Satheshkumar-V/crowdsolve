@@ -1,0 +1,8 @@
+flask
+python-dotenv
+sentence-transformers
+chromadb
+openai
+langchain==0.1.16
+langchain-openrouter==0.0.1
+pydantic>=2.5,<3.0

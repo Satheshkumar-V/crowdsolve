@@ -1,7 +1,8 @@
-const router = require('express').Router();
-const { flagContent } = require('../controllers/moderationController');
+const express = require('express');
+const router = express.Router();
+const moderationController = require('../controllers/moderationController');
 const { verifyToken } = require('../middlewares/authMiddleware');
 
-router.post('/flag', verifyToken, flagContent);
+router.post('/flag', verifyToken, moderationController.flagContent);
 
 module.exports = router;

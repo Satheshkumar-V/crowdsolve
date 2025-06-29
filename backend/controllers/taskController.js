@@ -1,24 +1,18 @@
 const Task = require('../models/Task');
-// const { extractTasksFromSolution, suggestTaskDeadlines } = require('../services/aiService');
+const { extractTasks } = require('../services/agentService');
 
-exports.createTask = async (req, res) => {
-const { challengeId, solutionText } = req.body;
+exports.autoGenerateTasks = async (req, res) => {
+  const { challengeId, solutionText } = req.body;
+  const tasks = await extractTasks(solutionText);
 
-  const tasks = await extractTasksFromSolution(solutionText);
-  const deadlines = await suggestTaskDeadlines(tasks.length);
-
-  const createdTasks = await Promise.all(tasks.map((task, i) =>
-    Task.create({
-      challengeId,
-      title: task,
-      dueDate: deadlines[i] || null,
-      checklist: []
-    })
-  ));
+  const createdTasks = await Promise.all(tasks.map((t, i) => {
+    const due = new Date();
+    due.setDate(due.getDate() + (i + 1) * 2);
+    return Task.create({ challengeId, title: t, dueDate: due, checklist: [] });
+  }));
 
   res.json({ tasks: createdTasks });
 };
-
 
 exports.getTasksByChallenge = async (req, res) => {
   const tasks = await Task.find({ challengeId: req.params.challengeId });
