@@ -1,4 +1,10 @@
-crowdSolve_Agents/.gitignore
 crowdSolve_Agents/.env
-.venv
-backend/.gitignore
+crowdSolve_Agents/venv
+crowdSolve_Agents/requirements.txt
+backend/.env
+backend/package-lock.json
+backend/package.json
+backend/node_modules
+frontend/node_modules
+frontend/package-lock.json
+frontend/package.json
