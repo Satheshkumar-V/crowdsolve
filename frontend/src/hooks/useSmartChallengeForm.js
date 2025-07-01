@@ -12,7 +12,7 @@ export const useSmartChallengeForm = (challengeData) => {
 
   useEffect(() => {
     if (challengeData.description.trim().length > 20) {
-      fetchSuggestedTags();
+    //   fetchSuggestedTags();
       fetchSimilarChallenges();
     }
   }, [challengeData.description]);

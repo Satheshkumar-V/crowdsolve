@@ -18,7 +18,8 @@ example query 5 = "need help organizing a college hackathon"
 suggestion tag 5 = #events, #coding, #student_community
 
 {content}
-Return as a list of lowercase strings.
+🛑 Only return a plain comma-separated list like: education, mental_health, sustainability
+❌ Do NOT include Python code, markdown, explanations, or formatting.
 """)
 
 moderation_prompt_template = """

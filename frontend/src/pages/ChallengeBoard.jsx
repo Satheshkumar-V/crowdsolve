@@ -1,14 +1,18 @@
-// Enhanced ChallengeBoard.jsx using useSmartChallengeForm hook
+// Enhanced ChallengeBoard.jsx using Gemini for similarity check
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ChallengeCard from '../components/ChallengeCard';
-import { useSmartChallengeForm } from '../hooks/useSmartChallengeForm';
 
 function ChallengeBoard() {
   const [challenges, setChallenges] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [similarResults, setSimilarResults] = useState([]);
+  const [skipSimilarityCheck, setSkipSimilarityCheck] = useState(false);
+  const [loadingTags, setLoadingTags] = useState(false);
+
   const [newChallenge, setNewChallenge] = useState({
     title: '',
     description: '',
@@ -20,15 +24,6 @@ function ChallengeBoard() {
 
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
-  const {
-    suggestedTags,
-    similarChallenges,
-    taskSuggestions,
-    fetchTaskSuggestions,
-    loadingTags,
-    loadingSimilar,
-    loadingTasks
-  } = useSmartChallengeForm(newChallenge);
 
   const fetchChallenges = async () => {
     setLoading(true);
@@ -41,22 +36,42 @@ function ChallengeBoard() {
     setLoading(false);
   };
 
-  const handlePost = async () => {
+  const handleSimilarityCheck = async () => {
     if (!newChallenge.title || !newChallenge.description) {
       alert('Please fill in required fields');
       return;
     }
-
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/challenges', {
-        ...newChallenge,
-        tags: newChallenge.tags.split(',').map(t => t.trim())
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await axios.post('http://localhost:8000/agent/check-similarity', {
+        content: newChallenge.description
       });
+      setSimilarResults(res.data.similar || []);
+      setShowConfirmModal(true);
+    } catch (error) {
+      console.warn('⚠️ Similarity check failed. Proceeding without results:', error);
+      setSimilarResults([]);
+      setShowConfirmModal(true);
+    }
+    setLoading(false);
+  };
+
+  const confirmAndPostChallenge = async () => {
+    setLoading(true);
+    try {
+      await axios.post(
+        'http://localhost:5000/api/challenges?skipSimilarity=true',
+        {
+          ...newChallenge,
+          tags: newChallenge.tags.split(',').map(t => t.trim())
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
       setNewChallenge({ title: '', description: '', content: '', tags: '', urgency: 'Low', category: 'Education' });
       setShowForm(false);
+      setShowConfirmModal(false);
       fetchChallenges();
     } catch (error) {
       console.error('Error posting challenge:', error);
@@ -69,6 +84,31 @@ function ChallengeBoard() {
     fetchChallenges();
   }, []);
 
+  useEffect(() => {
+  const shouldSuggest = newChallenge.description.length > 20 || newChallenge.content.length > 20;
+  if (!shouldSuggest) return;
+
+  const fetchSuggestedTags = async () => {
+    setLoadingTags(true);
+    try {
+      const res = await axios.post("http://localhost:8000/agent/suggest-tags", {
+        content: `${newChallenge.title}\n${newChallenge.description}\n${newChallenge.content}`
+      });
+      if (res.data.tags) {
+        setNewChallenge(prev => ({
+          ...prev,
+          tags: res.data.tags.join(', ')
+        }));
+      }
+    } catch (err) {
+      console.error("❌ Tag suggestion failed:", err);
+    }
+    setLoadingTags(false);
+  };
+
+  const debounce = setTimeout(fetchSuggestedTags, 1000); // ⏳ debounce typing
+  return () => clearTimeout(debounce);
+}, [newChallenge.description, newChallenge.content, newChallenge.title]);
   return (
     <div className="container animate-fade-in">
       <h1 className="page-title">🎯 Challenge Board</h1>
@@ -109,32 +149,12 @@ function ChallengeBoard() {
                 rows={4}
               />
               <input
-                placeholder="Tags (comma-separated: AI, ML, Web Dev)"
-                value={newChallenge.tags}
-                onChange={e => setNewChallenge({ ...newChallenge, tags: e.target.value })}
-              />
-
-              {suggestedTags.length > 0 && (
-                <div>
-                  <strong>🔖 Suggested Tags:</strong>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {suggestedTags.map((tag, i) => (
-                      <span key={i} className="tag">#{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {similarChallenges.length > 0 && (
-                <div style={{ marginTop: '1rem', padding: '1rem', border: '1px dashed #bbb', borderRadius: '12px' }}>
-                  <strong>🧠 Similar Challenges:</strong>
-                  <ul>
-                    {similarChallenges.map((c, i) => (
-                      <li key={i}>{c.text} (score: {c.score})</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+  placeholder="Tags (comma-separated: AI, ML, Web Dev)"
+  value={newChallenge.tags}
+  onChange={e => setNewChallenge({ ...newChallenge, tags: e.target.value })}
+  disabled={loadingTags}
+/>
+{loadingTags && <p style={{ fontSize: '0.8rem', color: '#888' }}>💡 Generating suggested tags...</p>}
 
               <div className="form-row">
                 <select
@@ -159,34 +179,50 @@ function ChallengeBoard() {
               </div>
 
               <button
-                onClick={handlePost}
+                onClick={handleSimilarityCheck}
                 disabled={loading}
                 style={{ width: '100%', marginTop: '1rem', opacity: loading ? 0.7 : 1 }}
               >
-                {loading ? '⏳ Posting...' : '🚀 Post Challenge'}
+                {loading ? '🔍 Checking Similarity...' : '🚀 Check & Post Challenge'}
               </button>
-
-              <button
-                onClick={fetchTaskSuggestions}
-                style={{ marginTop: '1rem', width: '100%' }}
-              >
-                🪄 Suggest Tasks from Description
-              </button>
-
-              {taskSuggestions.length > 0 && (
-                <div style={{ marginTop: '1rem' }}>
-                  <strong>✅ Suggested Tasks:</strong>
-                  <ul>
-                    {taskSuggestions.map((t, i) => (
-                      <li key={i}>{t}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           )}
         </>
       )}
+
+      {showConfirmModal && (
+  <div className="modal">
+    <h3>🧠 Similar Challenges Found</h3>
+
+    {similarResults.length === 0 || !similarResults[0]?.similar ? (
+      <p>No close matches found. Do you want to continue?</p>
+    ) : (
+      <>
+        <ul>
+          {similarResults[0].similar.map((s, i) => (
+            <li key={i}>
+              <p><strong>{s.text}</strong></p>
+              <p style={{ fontSize: '0.9rem', color: '#666' }}>Similarity Score: {s.score}</p>
+            </li>
+          ))}
+        </ul>
+
+        {similarResults[0].summary && (
+          <div className="summary-box" style={{ marginTop: '1rem', background: '#f9f9f9', padding: '10px', borderRadius: '5px' }}>
+            <strong>📝 Gemini Summary:</strong>
+            <p style={{ marginTop: '5px' }}>{similarResults[0].summary}</p>
+          </div>
+        )}
+      </>
+    )}
+
+    <div style={{ marginTop: '1rem' }}>
+      <button onClick={confirmAndPostChallenge}>✅ Yes, Post Challenge</button>
+      <button onClick={() => setShowConfirmModal(false)} style={{ marginLeft: '1rem' }}>❌ Cancel</button>
+    </div>
+  </div>
+)}
+
 
       {loading && <div className="loading-spinner"></div>}
 

@@ -1,25 +1,34 @@
 const Challenge = require('../models/Challenge');
-const { getSuggestedTags, checkSimilarity } = require('../services/agentService');
+const { checkSimilarity } = require('../services/agentService');
 
 exports.createChallenge = async (req, res) => {
   try {
     const data = req.body;
+    console.log("data:", data);
     data.createdBy = req.user.id;
     data.attachments = req.files ? Object.values(req.files).map(f => `/uploads/${f.name}`) : [];
 
-    const similarChallenges = await checkSimilarity(data.content || data.description);
-    if (similarChallenges.length > 0) {
-      return res.status(409).json({ message: "Similar challenge found", similar: similarChallenges });
-    }
+    // 🔁 If skipSimilarity=true, don't check
+    const skipSimilarity = req.query.skipSimilarity === 'true';
 
-    if (!data.tags || data.tags.length === 0) {
-      data.tags = await getSuggestedTags(data.content || data.description);
+    if (!skipSimilarity) {
+      const similarChallenges = await checkSimilarity(data.content || data.description);
+      console.log({ similarChallenges });
+
+      if (similarChallenges.length > 0) {
+        return res.status(200).json({
+          message: "Similar challenge found",
+          similar: similarChallenges
+        }); // ✅ prevent double response
+      }
     }
 
     const challenge = await Challenge.create(data);
-    res.status(201).json(challenge);
+    console.log({ challenge });
+    return res.status(201).json(challenge);
   } catch (err) {
-    res.status(500).json({ error: 'Challenge creation failed', detail: err.message });
+    console.error("❌ Challenge creation error:", err);
+    return res.status(500).json({ error: 'Challenge creation failed', detail: err.message });
   }
 };
 
